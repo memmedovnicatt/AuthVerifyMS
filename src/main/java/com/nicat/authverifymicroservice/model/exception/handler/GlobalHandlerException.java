@@ -2,6 +2,8 @@ package com.nicat.authverifymicroservice.model.exception.handler;
 
 import com.nicat.authverifymicroservice.model.exception.NotFoundException;
 import com.nicat.authverifymicroservice.model.exception.UnauthorizedException;
+import com.nicat.authverifymicroservice.model.exception.ForbiddenException;
+import com.nicat.authverifymicroservice.model.exception.AlreadyExistsException;
 import com.nicat.authverifymicroservice.model.exception.records.ExceptionMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
