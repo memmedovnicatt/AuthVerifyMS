@@ -1,12 +1,15 @@
 package com.nicat.authverifymicroservice.model.exception.handler;
 
 import com.nicat.authverifymicroservice.model.exception.NotFoundException;
+import com.nicat.authverifymicroservice.model.exception.UnauthorizedException;
+import com.nicat.authverifymicroservice.model.exception.records.ExceptionMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
@@ -31,15 +34,35 @@ public class GlobalHandlerException {
     }
 
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleNotAccess(RuntimeException ex) {
-        log.error("NotAccess ->  {}", ex.getMessage());
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    public ExceptionMessage handleForbiddenException(ForbiddenException ex) {
+        return new ExceptionMessage(ex.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFounds(RuntimeException ex) {
-        log.error("NotFound ->  {}", ex.getMessage());
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ExceptionMessage handleResourceNotFoundException(NotFoundException ex) {
+        log.error(ex.getMessage());
+        return new ExceptionMessage(ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ExceptionMessage handleAlreadyExistException(AlreadyExistsException ex) {
+        log.error(ex.getMessage());
+        return new ExceptionMessage(ex.getMessage());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionMessage handleGenericException(RuntimeException ex) {
+        return new ExceptionMessage(ex.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionMessage handleUnauthorizedException(UnauthorizedException ex) {
+        return new ExceptionMessage(ex.getMessage());
     }
 }

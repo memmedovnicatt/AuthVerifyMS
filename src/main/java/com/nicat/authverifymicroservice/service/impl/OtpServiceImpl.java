@@ -3,6 +3,8 @@ package com.nicat.authverifymicroservice.service.impl;
 import com.nicat.authverifymicroservice.configuration.redis.RedisRepository;
 import com.nicat.authverifymicroservice.dao.entity.User;
 import com.nicat.authverifymicroservice.dao.repository.UserRepository;
+import com.nicat.authverifymicroservice.model.exception.NotFoundException;
+import com.nicat.authverifymicroservice.model.exception.UnauthorizedException;
 import com.nicat.authverifymicroservice.service.EmailSenderService;
 import com.nicat.authverifymicroservice.service.OtpService;
 import com.nicat.authverifymicroservice.utils.SecurityUtil;
@@ -48,14 +50,14 @@ public class OtpServiceImpl implements OtpService {
     public void otpVerify(String otpCode) {
 
         String email = redisRepository.findByKey("otp:" + otpCode)
-                .orElseThrow(() -> new RuntimeException("OTP code is invalid or expired"));
+                .orElseThrow(() -> new UnauthorizedException("OTP code is invalid or expired"));
 
         String username = SecurityUtil.getCurrentUsername();
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+                .orElseThrow(() -> new NotFoundException("User not found with username: " + username));
 
         if (!StringUtils.equals(email, user.getEmail())) {
-            throw new RuntimeException("OTP code does not match the email in context");
+            throw new UnauthorizedException("OTP code does not match the email in context");
         }
 
         redisRepository.putByKey(
